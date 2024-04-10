@@ -1,68 +1,160 @@
-# Clase Nodo y Clase Lista (sin cambios)
+class Nodo:
+    def __init__(self, info):
+        self.Info = info
+        self.sig = None
 
-def listar_elementos(lista):
-    """Listar los elementos de la lista"""
-    lista.mostrar()
+# Clase Lista
+class Lista:
+    def __init__(self, *elem):
+        self.__primero = None
+        self.__ultimo = None
+        self.__ant_actual = None
+        for i in elem:
+            self.insertar_ultimo(i)
 
-def agregar_elemento(lista):
-    """Agregar un elemento al final de la lista"""
-    elemento = input("Ingrese el elemento a agregar: ")
-    lista.insertar_ultimo(elemento)
+    def insertar_inicio(self, *elem):
+        for i in elem:
+            nodo = Nodo(i)
+            if self.__primero != None:
+                nodo.sig = self.__primero
+            else:
+                self.__ultimo = nodo
+            self.__primero = nodo
 
-def eliminar_ultimo(lista):
-    """Eliminar el último elemento de la lista"""
-    lista.inicio()
-    while not lista.actual_es_ultimo():
-        lista.sig()
-    lista.elimina_actual()
+    def insertar_ultimo(self, *elem):
+        for i in elem:
+            nodo = Nodo(i)
+            if self.__ultimo != None:
+                self.__ultimo.sig = nodo
+                self.__ant_actual = self.__ultimo
+            else:
+                self.__primero = nodo
+            self.__ultimo = nodo
 
-def eliminar_primero(lista):
-    """Eliminar el primer elemento de la lista"""
-    lista.elimina_primero()
+    def elimina_primero(self):
+        if self.__primero == None:
+            return
+        nodo = self.__primero
+        self.__primero = nodo.sig
+        if self.__primero == None:
+            self.__ultimo = None
+        del nodo
 
-def insertar_inicio(lista):
-    """Insertar un elemento al inicio de la lista"""
-    elemento = input("Ingrese el elemento a insertar al inicio: ")
-    lista.insertar_inicio(elemento)
+    def __add__(self, list2):
+        list3 = Lista()
+        nodo = self.__primero
+        while nodo != None:
+            list3.insertar_ultimo(nodo.Info)
+            nodo = nodo.sig
+        nodo = list2.__primero
+        while nodo != None:
+            list3.insertar_ultimo(nodo.Info)
+            nodo = nodo.sig
+        return list3
 
-def insertar_final(lista):
-    """Insertar un elemento al final de la lista"""
-    elemento = input("Ingrese el elemento a insertar al final: ")
-    lista.insertar_ultimo(elemento)
+    def info_anterior(self):
+        if self.__primero == None or self.__ant_actual == None:
+            return
+        return self.__ant_actual.Info
 
-def salir():
-    """Salir del programa"""
-    print("Saliendo del programa...")
+    def eliminar_elem(self, elem):
+        while self.__primero != None and self.__primero.Info == elem:
+            temp = self.__primero
+            self.__primero = temp.sig
+            del temp
+            if self.__primero == None:
+                self.__ultimo = None
 
-def menu(opciones):
+        nodo = self.__primero
+        while nodo != None:
+            while nodo.sig != None and nodo.sig.Info == elem:
+                temp = nodo.sig
+                if temp == self.__ultimo:
+                    self.__ultimo = nodo
+                nodo.sig = temp.sig
+                del temp
+            nodo = nodo.sig
+
+    def sig(self):
+        if self.__primero == None:
+            return
+        if self.__ant_actual == None:
+            self.__ant_actual = self.__primero
+            return
+        actual = self.__ant_actual.sig
+        if actual.sig != None:
+            self.__ant_actual = actual
+
+    def elimina_actual(self):
+        if self.__primero == None:
+            return
+        if self.__ant_actual == None:
+            temp = self.__primero
+            self.__primero = temp.sig
+            if self.__primero == None:
+                self.__ultimo = None
+            del temp
+        else:
+            temp = self.__ant_actual.sig
+            self.__ant_actual.sig = temp.sig
+            if temp == self.__ultimo:
+                self.__ultimo = self.__ant_actual
+            del temp
+
+    def cons(self):
+        if self.__primero == None:
+            return
+        if self.__ant_actual == None:
+            return self.__primero.Info
+        return self.__ant_actual.sig.Info
+
+    def inicio(self):
+        self.__ant_actual = None
+
+    def actual_es_ultimo(self):
+        if self.__ant_actual != None:
+            if self.__ant_actual.sig == self.__ultimo:
+                return True
+        return False
+
+    def mostrar(self):
+        nodo = self.__primero
+        while nodo != None:
+            print(nodo.Info)
+            nodo = nodo.sig
+
+def menu():
     lista = Lista()
-
     while True:
         print("\nMenú de operaciones:")
-        for key, value in opciones.items():
-            print(f"{key}. {value.__doc__}")
-
+        print("1. Listar los elementos")
+        print("2. Agregar")
+        print("3. Eliminar el último")
+        print("4. Eliminar el primero")
+        print("5. Insertar al inicio")
+        print("6. Insertar al final")
+        print("7. Salir")
         opcion = input("Ingrese una opción: ")
 
-        if opcion in opciones:
-            operacion = opciones[opcion]
-            if operacion != salir:
-                operacion(lista)
-            else:
-                operacion()
-                break
+        if opcion == "1":
+            lista.mostrar()
+        elif opcion == "2":
+            elem = input("Ingrese los elementos a agregar separados por espacios: ").split()
+            lista.insertar_ultimo(*elem)
+        elif opcion == "3":
+            lista.elimina_primero()
+        elif opcion == "4":
+            lista.elimina_primero()
+        elif opcion == "5":
+            elem = input("Ingrese los elementos a insertar al inicio separados por espacios: ").split()
+            lista.insertar_inicio(*elem)
+        elif opcion == "6":
+            elem = input("Ingrese los elementos a insertar al final separados por espacios: ").split()
+            lista.insertar_ultimo(*elem)
+        elif opcion == "7":
+            break
         else:
-            print("Opción inválida. Intente nuevamente.")
+            print("Opción inválida. Intente de nuevo.")
 
-# Ejecutar el menú
-opciones = {
-    "1": listar_elementos,
-    "2": agregar_elemento,
-    "3": eliminar_ultimo,
-    "4": eliminar_primero,
-    "5": insertar_inicio,
-    "6": insertar_final,
-    "7": salir
-}
-
-menu(opciones)
+if __name__ == "__main__":
+    menu()
