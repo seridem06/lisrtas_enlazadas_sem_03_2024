@@ -64,3 +64,7 @@ lista.insertAtBegin(10)
 
 # Imprimir la lista enlazada
 lista.print()
+
+
+
+
